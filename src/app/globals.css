@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens lifted from the prototype. Every colour the UI uses is named
+ * here; no raw hex values belong in components. Crop colours are the exception
+ * — they live in the database, because a new crop must not require a deploy.
+ */
+@theme {
+  --color-canvas: #f4f2ee;
+  --color-surface: #ffffff;
+  --color-surface-muted: #faf8f4;
+  --color-segment: #eae6de;
+
+  --color-ink: #17140f;
+  --color-ink-muted: #77726a;
+  --color-ink-soft: #8a8a86;
+  --color-ink-faint: #a09a90;
+
+  --color-line: #e6e2db;
+  --color-line-soft: #f0ece4;
+  --color-line-input: #d8d3cb;
+
+  --color-up: #0f7a43;
+  --color-down: #c0392b;
+  --color-accent: #7a4a38;
+
+  --font-sans: var(--font-plex-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Prices must align digit-for-digit down a column. */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: #fff;
+  }
+
+  /* The prototype used clickable divs with no focus ring. Anything focusable
+     here gets a visible one. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}

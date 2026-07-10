@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;background:#F4F2EE;color:#17140F;-webkit-font-smoothing:antialiased}
+a{color:#7A4A38;text-decoration:none}
+a:hover{color:#5c3529}
+button{font-family:inherit}
+table{font-variant-numeric:tabular-nums}
+::selection{background:#17140F;color:#fff}
+</style>
+</helmet>
+
+<div style="min-height:100vh">
+
+  <header style="position:sticky;top:0;z-index:30;background:rgba(244,242,238,0.86);backdrop-filter:blur(12px);border-bottom:1px solid #E6E2DB;padding:13px clamp(16px,4vw,40px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:11px;background:#17140F;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;font-family:'IBM Plex Mono',monospace">◈</div>
+      <div>
+        <div style="font-size:16.5px;font-weight:600;letter-spacing:-0.01em;color:#17140F">Cotação do Campo</div>
+        <div style="font-size:12px;color:#8a8a86">Fonte: CEPEA/ESALQ · Indicador diário</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <div style="text-align:right;line-height:1.35">
+        <div style="font-size:10.5px;color:#a09a90;text-transform:uppercase;letter-spacing:0.07em">Última atualização</div>
+        <div style="font-size:13px;color:#17140F;font-weight:500;font-family:'IBM Plex Mono',monospace">{{ updatedLabel }}</div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:3px">
+        <span style="font-size:10.5px;color:#a09a90;text-transform:uppercase;letter-spacing:0.07em">Praça de negociação</span>
+        <select value="{{ region }}" onChange="{{ setRegion }}" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:8px 11px;font-size:13.5px;font-weight:500;color:#17140F;cursor:pointer;font-family:inherit;min-width:180px">
+          <sc-for list="{{ regionOpts }}" as="r" hint-placeholder-count="5"><option value="{{ r.id }}">{{ r.nome }}</option></sc-for>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1240px;margin:0 auto;padding:clamp(18px,3vw,30px) clamp(16px,4vw,40px) 64px">
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+      <div>
+        <h2 style="margin:0;font-size:17px;font-weight:600;letter-spacing:-0.01em;color:#17140F">Panorama de hoje</h2>
+        <p style="margin:3px 0 0;font-size:12.5px;color:#8a8a86">Toque num card para abrir o histórico da cultura</p>
+      </div>
+      <div style="display:inline-flex;background:#EAE6DE;border-radius:11px;padding:3px;gap:2px">
+        <sc-for list="{{ cardStyles }}" as="b" hint-placeholder-count="3"><button onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</button></sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ styleA }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(214px,1fr));gap:14px">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="5">
+        <div onClick="{{ c.open }}" style="background:#fff;border:1px solid #E6E2DB;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:box-shadow .16s,transform .16s" style-hover="box-shadow:0 10px 26px rgba(0,0,0,0.09);transform:translateY(-2px)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;color:#17140F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.nome }}</div><div style="font-size:11.5px;color:#a09a90;margin-top:1px;white-space:nowrap">{{ c.unit }}</div></div>
+            <span style="width:11px;height:11px;border-radius:3px;background:{{ c.color }};margin-top:3px;flex:none"></span>
+          </div>
+          <div style="font-size:31px;font-weight:600;letter-spacing:-0.02em;color:#17140F;line-height:1"><span style="font-size:15px;font-weight:500;color:#a09a90;margin-right:3px">R$</span>{{ c.priceFmt }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;padding:3px 9px;border-radius:20px;color:{{ c.dayColor }};background:{{ c.dayBg }};font-family:'IBM Plex Mono',monospace">{{ c.arrow }} {{ c.dayFmt }}</span>
+            <span style="font-size:11px;color:#a09a90">7 dias</span>
+          </div>
+          <div>{{ c.spark }}</div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ styleB }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(164px,1fr));gap:10px">
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="5">
+        <div onClick="{{ c.open }}" style="background:#fff;border:1px solid #E6E2DB;border-radius:12px;padding:13px 15px;cursor:pointer;display:flex;flex-direction:column;gap:9px;transition:box-shadow .16s" style-hover="box-shadow:0 6px 16px rgba(0,0,0,0.07)">
+          <div style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:2px;background:{{ c.color }}"></span><span style="font-size:13px;font-weight:600;color:#17140F">{{ c.nome }}</span></div>
+          <div style="font-size:23px;font-weight:600;letter-spacing:-0.02em;color:#17140F;line-height:1"><span style="font-size:12px;color:#a09a90;margin-right:2px">R$</span>{{ c.priceFmt }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+            <span style="font-size:12px;font-weight:600;color:{{ c.dayColor }};font-family:'IBM Plex Mono',monospace">{{ c.arrow }} {{ c.dayFmt }}</span>
+            <span>{{ c.sparkMini }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ styleC }}">
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div onClick="{{ feat.open }}" style="flex:1 1 340px;min-width:300px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;padding:22px;cursor:pointer;display:flex;flex-direction:column;gap:16px;transition:box-shadow .16s" style-hover="box-shadow:0 12px 32px rgba(0,0,0,0.10)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span style="display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#a09a90"><span style="width:12px;height:12px;border-radius:3px;background:{{ feat.color }}"></span>Maior movimento hoje</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;padding:4px 11px;border-radius:20px;color:{{ feat.dayColor }};background:{{ feat.dayBg }};font-family:'IBM Plex Mono',monospace">{{ feat.arrow }} {{ feat.dayFmt }}</span>
+        </div>
+        <div><div style="font-size:21px;font-weight:600;color:#17140F;white-space:nowrap">{{ feat.nome }}</div><div style="font-size:12px;color:#a09a90;margin-top:2px;white-space:nowrap">{{ feat.unit }} · {{ pracaName }}</div></div>
+        <div style="font-size:47px;font-weight:600;letter-spacing:-0.02em;color:#17140F;line-height:1"><span style="font-size:21px;color:#a09a90;margin-right:4px">R$</span>{{ feat.priceFmt }}</div>
+        <div>{{ feat.sparkBig }}</div>
+      </div>
+      <div style="flex:1 1 300px;min-width:264px;display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ others }}" as="c" hint-placeholder-count="4">
+          <div onClick="{{ c.open }}" style="background:#fff;border:1px solid #E6E2DB;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:13px;transition:box-shadow .16s" style-hover="box-shadow:0 6px 16px rgba(0,0,0,0.06)">
+            <span style="width:9px;height:9px;border-radius:2px;background:{{ c.color }};flex:none"></span>
+            <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:#17140F">{{ c.nome }}</div><div style="font-size:11px;color:#a09a90">{{ c.unit }}</div></div>
+            <span style="flex:none">{{ c.sparkMini }}</span>
+            <div style="text-align:right;flex:none;min-width:92px">
+              <div style="font-size:17px;font-weight:600;color:#17140F">R$ {{ c.priceFmt }}</div>
+              <div style="font-size:12px;font-weight:600;color:{{ c.dayColor }};font-family:'IBM Plex Mono',monospace">{{ c.arrow }} {{ c.dayFmt }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <div style="margin-top:26px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;padding:clamp(16px,2.5vw,24px)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="max-width:520px"><h2 style="margin:0;font-size:16px;font-weight:600;color:#17140F">Comparativo de preços</h2><p style="margin:4px 0 0;font-size:12.5px;color:#8a8a86">{{ yModeHint }}</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+          <div style="display:inline-flex;background:#EAE6DE;border-radius:10px;padding:3px;gap:2px"><sc-for list="{{ yModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for></div>
+          <div style="display:inline-flex;background:#EAE6DE;border-radius:10px;padding:3px;gap:2px"><sc-for list="{{ periods }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button></sc-for></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.toggle }}" style="{{ c.style }}"><span style="width:9px;height:9px;border-radius:2px;background:{{ c.dot }}"></span>{{ c.nome }}</button></sc-for>
+      </div>
+      <div style="width:100%">{{ mainChartEl }}</div>
+    </div>
+
+    <div style="margin-top:26px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:2 1 520px;min-width:300px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;overflow:hidden">
+        <div style="padding:18px 20px 12px"><h2 style="margin:0;font-size:16px;font-weight:600;color:#17140F">Detalhamento por cultura</h2><p style="margin:4px 0 0;font-size:12.5px;color:#8a8a86">Clique numa linha para o detalhe · ordene pelas colunas</p></div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+            <thead><tr style="border-bottom:1px solid #E6E2DB">
+              <th onClick="{{ sortNome }}" style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;cursor:pointer;white-space:nowrap">Cultura{{ indNome }}</th>
+              <th onClick="{{ sortPrice }}" style="padding:11px 16px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;cursor:pointer;white-space:nowrap">Preço{{ indPrice }}</th>
+              <th onClick="{{ sortDay }}" style="padding:11px 16px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;cursor:pointer;white-space:nowrap">Dia{{ indDay }}</th>
+              <th onClick="{{ sortWeek }}" style="padding:11px 16px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;cursor:pointer;white-space:nowrap">Semana{{ indWeek }}</th>
+              <th onClick="{{ sortMonth }}" style="padding:11px 16px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;cursor:pointer;white-space:nowrap">Mês{{ indMonth }}</th>
+              <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;white-space:nowrap">Praça</th>
+              <th style="padding:11px 16px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86;white-space:nowrap">Cotação</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ tableRows }}" as="r" hint-placeholder-count="5">
+                <tr onClick="{{ r.open }}" style="border-bottom:1px solid #F0ECE4;cursor:pointer" style-hover="background:#FAF8F4">
+                  <td style="padding:13px 16px"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:2px;background:{{ r.color }}"></span><b style="font-weight:600;color:#17140F">{{ r.nome }}</b></span><div style="font-size:11px;color:#a09a90;padding-left:17px">{{ r.unit }}</div></td>
+                  <td style="padding:13px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:#17140F;white-space:nowrap">R$ {{ r.priceFmt }}</td>
+                  <td style="padding:13px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap;color:{{ r.dayColor }}">{{ r.dayFmt }}</td>
+                  <td style="padding:13px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:500;white-space:nowrap;color:{{ r.weekColor }}">{{ r.weekFmt }}</td>
+                  <td style="padding:13px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:500;white-space:nowrap;color:{{ r.monthColor }}">{{ r.monthFmt }}</td>
+                  <td style="padding:13px 16px;color:#77726A;white-space:nowrap">{{ r.praca }}</td>
+                  <td style="padding:13px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#a09a90;white-space:nowrap">{{ r.dataStr }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="flex:1 1 300px;min-width:280px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+          <h2 style="margin:0;font-size:16px;font-weight:600;color:#17140F">Alertas de preço</h2>
+          <button onClick="{{ toggleAlertForm }}" style="border:1px solid #17140F;background:#17140F;color:#fff;border-radius:9px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer">{{ alertBtnLabel }}</button>
+        </div>
+        <p style="margin:0 0 14px;font-size:12.5px;color:#8a8a86">Ex.: avisar quando a soja passar de R$ 130/saca.</p>
+
+        <sc-if value="{{ showAlertForm }}">
+          <div style="background:#FAF8F4;border:1px solid #E6E2DB;border-radius:12px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Cultura</label><select value="{{ draftCulture }}" onChange="{{ setDraftCulture }}" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#17140F;font-family:inherit;width:100%"><sc-for list="{{ cultureOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.id }}">{{ o.nome }}</option></sc-for></select></div>
+            <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Condição</label><select value="{{ draftDirection }}" onChange="{{ setDraftDirection }}" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#17140F;font-family:inherit;width:100%"><option value="above">Preço subir acima de</option><option value="below">Preço cair abaixo de</option></select></div>
+            <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Valor-alvo (R$)</label><input value="{{ draftTarget }}" onInput="{{ setDraftTarget }}" placeholder="Ex.: 130,00" inputmode="decimal" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#17140F;font-family:'IBM Plex Mono',monospace;width:100%"></div>
+            <div style="display:flex;gap:8px;margin-top:2px"><button onClick="{{ saveAlert }}" style="flex:1;border:1px solid #17140F;background:#17140F;color:#fff;border-radius:9px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">{{ saveLabel }}</button><button onClick="{{ cancelAlert }}" style="flex:none;border:1px solid #D8D3CB;background:#fff;color:#77726A;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer">Cancelar</button></div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ alertList }}" as="a" hint-placeholder-count="3">
+            <div style="border:1px solid #E6E2DB;border-radius:12px;padding:12px 14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#17140F"><span style="width:9px;height:9px;border-radius:2px;background:{{ a.color }}"></span>{{ a.nome }}</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;color:{{ a.statusColor }};background:{{ a.statusBg }}">{{ a.statusDot }} {{ a.statusText }}</span></div>
+              <div style="font-size:12.5px;color:#77726A;margin:8px 0 11px;line-height:1.45">Avisar quando ficar {{ a.condText }} <b style="color:#17140F;font-family:'IBM Plex Mono',monospace">R$ {{ a.targetFmt }}</b><br><span style="color:#a09a90">atual: R$ {{ a.curFmt }}</span></div>
+              <div style="display:flex;gap:8px"><button onClick="{{ a.edit }}" style="flex:1;border:1px solid #D8D3CB;background:#fff;color:#17140F;border-radius:8px;padding:6px;font-size:12px;font-weight:500;cursor:pointer">Editar</button><button onClick="{{ a.remove }}" style="flex:1;border:1px solid #F0D8D4;background:#fff;color:#C0392B;border-radius:8px;padding:6px;font-size:12px;font-weight:500;cursor:pointer">Excluir</button></div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noAlerts }}"><div style="text-align:center;color:#a09a90;font-size:13px;padding:18px 0;border:1px dashed #D8D3CB;border-radius:12px">Nenhum alerta configurado ainda.</div></sc-if>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1120px;margin:0 auto;padding:clamp(14px,2.5vw,26px) clamp(16px,4vw,40px) 64px">
+    <button onClick="{{ closeDetail }}" style="border:none;background:none;color:#77726A;font-size:13.5px;font-weight:500;cursor:pointer;padding:6px 0;display:inline-flex;align-items:center;gap:6px">← Voltar ao painel</button>
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:12px">
+      <div><div style="display:flex;align-items:center;gap:11px"><span style="width:15px;height:15px;border-radius:4px;background:{{ detail.color }}"></span><h1 style="margin:0;font-size:29px;font-weight:600;letter-spacing:-0.02em;color:#17140F">{{ detail.nome }}</h1></div><div style="font-size:13px;color:#8a8a86;margin-top:5px">{{ detail.unit }} · Praça: {{ detail.praca }} · Fonte CEPEA/ESALQ</div></div>
+      <div style="text-align:right"><div style="font-size:45px;font-weight:600;letter-spacing:-0.02em;color:#17140F;line-height:1"><span style="font-size:20px;color:#a09a90;margin-right:4px">R$</span>{{ detail.priceFmt }}</div><span style="display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:600;padding:4px 11px;border-radius:20px;color:{{ detail.dayColor }};background:{{ detail.dayBg }};font-family:'IBM Plex Mono',monospace;margin-top:8px">{{ detail.dayArrow }} {{ detail.dayFmt }} hoje</span></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:24px">
+      <div style="background:#fff;border:1px solid #E6E2DB;border-radius:14px;padding:15px 16px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#a09a90">Variação semana</div><div style="font-size:22px;font-weight:600;margin-top:5px;font-family:'IBM Plex Mono',monospace;color:{{ detail.weekColor }}">{{ detail.weekFmt }}</div></div>
+      <div style="background:#fff;border:1px solid #E6E2DB;border-radius:14px;padding:15px 16px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#a09a90">Variação mês</div><div style="font-size:22px;font-weight:600;margin-top:5px;font-family:'IBM Plex Mono',monospace;color:{{ detail.monthColor }}">{{ detail.monthFmt }}</div></div>
+      <div style="background:#fff;border:1px solid #E6E2DB;border-radius:14px;padding:15px 16px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#a09a90">Mínima do período</div><div style="font-size:22px;font-weight:600;margin-top:5px;font-family:'IBM Plex Mono',monospace;color:#17140F">R$ {{ detail.minFmt }}</div></div>
+      <div style="background:#fff;border:1px solid #E6E2DB;border-radius:14px;padding:15px 16px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#a09a90">Máxima do período</div><div style="font-size:22px;font-weight:600;margin-top:5px;font-family:'IBM Plex Mono',monospace;color:#17140F">R$ {{ detail.maxFmt }}</div></div>
+    </div>
+
+    <div style="margin-top:22px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;padding:clamp(16px,2.5vw,24px)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px"><h2 style="margin:0;font-size:16px;font-weight:600;color:#17140F">Histórico de preços</h2><div style="display:inline-flex;background:#EAE6DE;border-radius:10px;padding:3px;gap:2px"><sc-for list="{{ dPeriods }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button></sc-for></div></div>
+      <div style="width:100%">{{ detail.chart }}</div>
+    </div>
+
+    <div style="margin-top:22px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:1 1 340px;min-width:300px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;overflow:hidden">
+        <div style="padding:18px 20px 10px"><h2 style="margin:0;font-size:16px;font-weight:600;color:#17140F">Últimas cotações</h2></div>
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+          <thead><tr style="border-bottom:1px solid #E6E2DB"><th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Data</th><th style="padding:10px 20px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Preço</th><th style="padding:10px 20px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Variação</th></tr></thead>
+          <tbody><sc-for list="{{ detail.recent }}" as="q" hint-placeholder-count="6"><tr style="border-bottom:1px solid #F0ECE4"><td style="padding:12px 20px;color:#77726A;font-family:'IBM Plex Mono',monospace">{{ q.dateStr }}</td><td style="padding:12px 20px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:#17140F">R$ {{ q.priceFmt }}</td><td style="padding:12px 20px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:500;color:{{ q.chColor }}">{{ q.chFmt }}</td></tr></sc-for></tbody>
+        </table>
+      </div>
+
+      <div style="flex:1 1 300px;min-width:280px;background:#fff;border:1px solid #E6E2DB;border-radius:18px;padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:600;color:#17140F">Alertas desta cultura</h2><button onClick="{{ detail.openAlert }}" style="border:1px solid #17140F;background:#17140F;color:#fff;border-radius:9px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer">+ Novo</button></div>
+        <p style="margin:0 0 14px;font-size:12.5px;color:#8a8a86">Defina um preço-alvo para {{ detail.nome }} e acompanhe.</p>
+
+        <sc-if value="{{ showAlertForm }}">
+          <div style="background:#FAF8F4;border:1px solid #E6E2DB;border-radius:12px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Cultura</label><select value="{{ draftCulture }}" onChange="{{ setDraftCulture }}" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#17140F;font-family:inherit;width:100%"><sc-for list="{{ cultureOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.id }}">{{ o.nome }}</option></sc-for></select></div>
+            <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Condição</label><select value="{{ draftDirection }}" onChange="{{ setDraftDirection }}" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#17140F;font-family:inherit;width:100%"><option value="above">Preço subir acima de</option><option value="below">Preço cair abaixo de</option></select></div>
+            <div style="display:flex;flex-direction:column;gap:5px"><label style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a86">Valor-alvo (R$)</label><input value="{{ draftTarget }}" onInput="{{ setDraftTarget }}" placeholder="Ex.: 130,00" inputmode="decimal" style="border:1px solid #D8D3CB;background:#fff;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#17140F;font-family:'IBM Plex Mono',monospace;width:100%"></div>
+            <div style="display:flex;gap:8px;margin-top:2px"><button onClick="{{ saveAlert }}" style="flex:1;border:1px solid #17140F;background:#17140F;color:#fff;border-radius:9px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">{{ saveLabel }}</button><button onClick="{{ cancelAlert }}" style="flex:none;border:1px solid #D8D3CB;background:#fff;color:#77726A;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer">Cancelar</button></div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ detail.alerts }}" as="a" hint-placeholder-count="2">
+            <div style="border:1px solid #E6E2DB;border-radius:12px;padding:12px 14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:13.5px;font-weight:600;color:#17140F">{{ a.condLabel }}</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;color:{{ a.statusColor }};background:{{ a.statusBg }}">{{ a.statusDot }} {{ a.statusText }}</span></div>
+              <div style="font-size:12.5px;color:#a09a90;margin:7px 0 10px">alvo R$ {{ a.targetFmt }} · atual R$ {{ a.curFmt }}</div>
+              <div style="display:flex;gap:8px"><button onClick="{{ a.edit }}" style="flex:1;border:1px solid #D8D3CB;background:#fff;color:#17140F;border-radius:8px;padding:6px;font-size:12px;font-weight:500;cursor:pointer">Editar</button><button onClick="{{ a.remove }}" style="flex:1;border:1px solid #F0D8D4;background:#fff;color:#C0392B;border-radius:8px;padding:6px;font-size:12px;font-weight:500;cursor:pointer">Excluir</button></div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ detail.noAlerts }}"><div style="text-align:center;color:#a09a90;font-size:13px;padding:18px 0;border:1px dashed #D8D3CB;border-radius:12px">Sem alertas para esta cultura.</div></sc-if>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;defaultRegion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;PR&quot;,&quot;MT&quot;,&quot;SP&quot;,&quot;GO&quot;,&quot;RS&quot;],&quot;default&quot;:&quot;PR&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Padrões&quot;},&quot;defaultCardStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;a&quot;,&quot;b&quot;,&quot;c&quot;],&quot;default&quot;:&quot;c&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Padrões&quot;},&quot;updatedLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Hoje, 08/07/2026 · 18h30&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Padrões&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const p = props || {};
+    this.CULTS = [
+      {id:'soja', nome:'Soja', unit:'R$/saca 60kg', base:128, vol:0.9, seed:12},
+      {id:'milho', nome:'Milho', unit:'R$/saca 60kg', base:62, vol:0.55, seed:77},
+      {id:'trigo', nome:'Trigo', unit:'R$/saca 60kg', base:74, vol:0.7, seed:915},
+      {id:'cafe', nome:'Café arábica', unit:'R$/saca 60kg', base:1850, vol:20, seed:333},
+      {id:'algodao', nome:'Algodão', unit:'R$/@ 15kg', base:148, vol:1.5, seed:501},
+    ];
+    this.COLORS = {soja:'#C57B2C', milho:'#D9A520', trigo:'#B08247', cafe:'#7A4A38', algodao:'#4F7488'};
+    this.REGIONS = [
+      {id:'PR', nome:'Paraná', mult:1.00},
+      {id:'MT', nome:'Mato Grosso', mult:0.94},
+      {id:'SP', nome:'São Paulo', mult:1.03},
+      {id:'GO', nome:'Goiás', mult:0.96},
+      {id:'RS', nome:'Rio Grande do Sul', mult:1.01},
+    ];
+    this.series = {};
+    this.CULTS.forEach(c=>{
+      this.series[c.id] = {};
+      this.REGIONS.forEach((r,ri)=>{
+        const regionBase = c.base * r.mult;
+        this.series[c.id][r.id] = this.gen(regionBase, c.vol * (0.85 + ri*0.08), c.seed + ri*137);
+      });
+    });
+    this.dates = this.makeDates(this.series.soja[this.REGIONS[0].id].length);
+    this.state = {
+      view:'dashboard', selected:null,
+      region: (p.defaultRegion || 'PR'),
+      cardStyle: (p.defaultCardStyle || 'a'),
+      period:30, yMode:'pct',
+      active:{soja:true, milho:true, trigo:false, cafe:true, algodao:false},
+      sortKey:'dayPct', sortDir:-1, hover:null,
+      dPeriod:90, dHover:null,
+      alerts:[
+        {id:1, cultureId:'soja', direction:'above', target:132},
+        {id:2, cultureId:'cafe', direction:'above', target:1800},
+        {id:3, cultureId:'milho', direction:'below', target:58},
+      ],
+      showAlertForm:false, editingAlert:null,
+      alertDraft:{cultureId:'soja', direction:'above', target:''},
+      nextId:4,
+    };
+  }
+
+  mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  gen(base, vol, seed){ const n=366, rnd=this.mulberry(seed); let pr=base; const out=[]; for(let i=0;i<n;i++){ pr += (base-pr)*0.015 + (rnd()-0.5)*vol*2.2; out.push(Math.max(pr, base*0.55)); } return out; }
+  makeDates(n){ const out=[]; const today=new Date(2026,6,8); for(let i=n-1;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); out.push(d); } return out; }
+  fmt(n,dec){ if(dec==null)dec=2; return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+  pct(n){ return (n>=0?'+':'')+Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'; }
+  shortDate(d){ return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); }
+  longDate(d){ return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); }
+  seg(active){ return `border:none;background:${active?'#fff':'transparent'};color:${active?'#17140F':'#77726A'};box-shadow:${active?'0 1px 2px rgba(0,0,0,0.12)':'none'};font-weight:${active?600:500};padding:6px 13px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap`; }
+
+  computeMetrics(regionId){ const m={}; this.CULTS.forEach(c=>{ const s=this.series[c.id][regionId]; const n=s.length; const cur=s[n-1]; m[c.id]={cur, series:s, day:(cur/s[n-2]-1)*100, week:(cur/s[n-8]-1)*100, month:(cur/s[n-31]-1)*100}; }); return m; }
+
+  makeSpark(vals, up, w, ht){ w=w||132; ht=ht||40; const h=React.createElement; const p=4; const min=Math.min.apply(null,vals), max=Math.max.apply(null,vals); const rng=(max-min)||1; const n=vals.length; const col=up?'#0F7A43':'#C0392B'; const pts=vals.map((v,i)=>[p+(n<=1?0:i/(n-1))*(w-2*p), p+(1-(v-min)/rng)*(ht-2*p)]); const d='M'+pts.map(pt=>pt[0].toFixed(1)+' '+pt[1].toFixed(1)).join(' L'); const area=d+` L ${pts[n-1][0].toFixed(1)} ${ht-1} L ${pts[0][0].toFixed(1)} ${ht-1} Z`; return h('svg',{viewBox:`0 0 ${w} ${ht}`, style:{width:'100%',height:ht+'px',display:'block',overflow:'visible'}, preserveAspectRatio:'none'}, [ h('path',{key:'a',d:area,fill:col,fillOpacity:0.10}), h('path',{key:'l',d,fill:'none',stroke:col,strokeWidth:1.8,strokeLinejoin:'round',strokeLinecap:'round'}) ]); }
+
+  makeMainChart(M, S){ const h=React.createElement; const viewW=900,viewH=360,padL=58,padR=20,padT=18,padB=34; const plotW=viewW-padL-padR, plotH=viewH-padT-padB; const active=this.CULTS.filter(c=>S.active[c.id]); const period=S.period; const idx0=this.dates.length-period; const series={}; active.forEach(c=>{ series[c.id]=M[c.id].series.slice(-period); }); const n=period; const tf=(cid,v)=>{ if(S.yMode==='pct'){ const b=series[cid][0]; return (v/b-1)*100; } return v; }; let vals=[]; active.forEach(c=>{ series[c.id].forEach(v=>vals.push(tf(c.id,v))); }); if(!vals.length) vals=[0,1]; let min=Math.min.apply(null,vals), max=Math.max.apply(null,vals); const padv=(max-min)*0.10||1; min-=padv; max+=padv; const X=i=> padL+(n<=1?0:i/(n-1))*plotW; const Y=v=> padT+(1-(v-min)/(max-min))*plotH; const kids=[];
+    for(let t=0;t<=5;t++){ const val=min+(max-min)*t/5; const y=Y(val); kids.push(h('line',{key:'g'+t,x1:padL,x2:viewW-padR,y1:y,y2:y,stroke:'#00000010',strokeWidth:1})); const lbl=S.yMode==='pct'?((val>=0?'+':'')+val.toFixed(0)+'%'):this.fmt(val,0); kids.push(h('text',{key:'yl'+t,x:padL-8,y:y+4,textAnchor:'end',fontSize:12,fill:'#a09a90',fontFamily:'IBM Plex Mono, monospace'},lbl)); }
+    const xt=Math.min(6,n); for(let t=0;t<xt;t++){ const i=xt<=1?0:Math.round(t/(xt-1)*(n-1)); const x=X(i); kids.push(h('text',{key:'xl'+t,x:x,y:viewH-12,textAnchor:'middle',fontSize:11.5,fill:'#a09a90',fontFamily:'IBM Plex Mono, monospace'}, this.shortDate(this.dates[idx0+i]))); }
+    active.forEach(c=>{ const arr=series[c.id]; const d='M'+arr.map((v,i)=>X(i).toFixed(1)+' '+Y(tf(c.id,v)).toFixed(1)).join(' L'); kids.push(h('path',{key:'p'+c.id,d,fill:'none',stroke:this.COLORS[c.id],strokeWidth:2.2,strokeLinejoin:'round',strokeLinecap:'round'})); });
+    if(S.hover && S.hover.index!=null && S.hover.index<n){ const i=S.hover.index; const x=X(i); kids.push(h('line',{key:'hv',x1:x,x2:x,y1:padT,y2:viewH-padB,stroke:'#00000030',strokeWidth:1,strokeDasharray:'3 3'})); active.forEach(c=>{ kids.push(h('circle',{key:'d'+c.id,cx:x,cy:Y(tf(c.id,series[c.id][i])),r:3.5,fill:'#fff',stroke:this.COLORS[c.id],strokeWidth:2})); }); const lines=active.map(c=>({nome:c.nome,color:this.COLORS[c.id],val:this.fmt(series[c.id][i])})); const tw=182, thh=30+lines.length*20; let tx=x+12; if(tx+tw>viewW) tx=x-12-tw; const ty=padT+6; kids.push(h('rect',{key:'tr',x:tx,y:ty,width:tw,height:thh,rx:9,fill:'#17140F',opacity:0.97})); kids.push(h('text',{key:'td',x:tx+13,y:ty+19,fontSize:11.5,fill:'#b8b2a8',fontFamily:'IBM Plex Mono, monospace'}, this.longDate(this.dates[idx0+i]))); lines.forEach((ln,k)=>{ const yy=ty+40+k*20; kids.push(h('circle',{key:'tc'+k,cx:tx+17,cy:yy-4,r:4,fill:ln.color})); kids.push(h('text',{key:'tn'+k,x:tx+27,y:yy,fontSize:12.5,fill:'#fff',fontFamily:'IBM Plex Sans, sans-serif'}, ln.nome)); kids.push(h('text',{key:'tv'+k,x:tx+tw-12,y:yy,textAnchor:'end',fontSize:12.5,fontWeight:600,fill:'#fff',fontFamily:'IBM Plex Mono, monospace'}, 'R$ '+ln.val)); }); }
+    if(!active.length){ kids.push(h('text',{key:'empty',x:viewW/2,y:viewH/2,textAnchor:'middle',fontSize:15,fill:'#a09a90',fontFamily:'IBM Plex Sans, sans-serif'}, 'Selecione ao menos uma cultura acima')); }
+    kids.push(h('rect',{key:'ov',x:padL,y:padT,width:plotW,height:plotH,fill:'transparent',
+      onMouseMove:(e)=>{ const svg=e.currentTarget.ownerSVGElement; const r=svg.getBoundingClientRect(); const relX=(e.clientX-r.left)/r.width*viewW; let frac=(relX-padL)/plotW; let i=Math.round(frac*(n-1)); i=Math.max(0,Math.min(n-1,i)); this.setState({hover:{index:i}}); },
+      onMouseLeave:()=>this.setState({hover:null}) }));
+    return h('svg',{viewBox:`0 0 ${viewW} ${viewH}`, style:{width:'100%',height:'auto',display:'block',touchAction:'none'}, preserveAspectRatio:'xMidYMid meet'}, kids);
+  }
+
+  makeDetailChart(cid, M, S){ const h=React.createElement; const color=this.COLORS[cid]; const viewW=900,viewH=320,padL=58,padR=20,padT=18,padB=32; const plotW=viewW-padL-padR, plotH=viewH-padT-padB; const s=M[cid].series.slice(-S.dPeriod); const n=s.length; const idx0=this.dates.length-S.dPeriod; let min=Math.min.apply(null,s), max=Math.max.apply(null,s); const pv=(max-min)*0.12||1; min-=pv; max+=pv; const X=i=>padL+(n<=1?0:i/(n-1))*plotW; const Y=v=>padT+(1-(v-min)/(max-min))*plotH; const kids=[];
+    for(let t=0;t<=4;t++){ const val=min+(max-min)*t/4; const y=Y(val); kids.push(h('line',{key:'g'+t,x1:padL,x2:viewW-padR,y1:y,y2:y,stroke:'#00000010'})); kids.push(h('text',{key:'yl'+t,x:padL-8,y:y+4,textAnchor:'end',fontSize:12,fill:'#a09a90',fontFamily:'IBM Plex Mono, monospace'}, this.fmt(val,0))); }
+    const xt=Math.min(6,n); for(let t=0;t<xt;t++){ const i=xt<=1?0:Math.round(t/(xt-1)*(n-1)); const x=X(i); kids.push(h('text',{key:'xl'+t,x,y:viewH-10,textAnchor:'middle',fontSize:11.5,fill:'#a09a90',fontFamily:'IBM Plex Mono, monospace'}, this.shortDate(this.dates[idx0+i]))); }
+    const line='M'+s.map((v,i)=>X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' L'); const area=line+` L ${X(n-1).toFixed(1)} ${padT+plotH} L ${X(0).toFixed(1)} ${padT+plotH} Z`; const gid='grad_'+cid;
+    kids.push(h('defs',{key:'df'}, h('linearGradient',{id:gid,x1:0,y1:0,x2:0,y2:1}, h('stop',{key:'a',offset:'0%',stopColor:color,stopOpacity:0.22}), h('stop',{key:'b',offset:'100%',stopColor:color,stopOpacity:0}))));
+    kids.push(h('path',{key:'ar',d:area,fill:`url(#${gid})`})); kids.push(h('path',{key:'ln',d:line,fill:'none',stroke:color,strokeWidth:2.4,strokeLinejoin:'round'}));
+    if(S.dHover && S.dHover.index!=null && S.dHover.index<n){ const i=S.dHover.index; const x=X(i); const v=s[i]; kids.push(h('line',{key:'hv',x1:x,x2:x,y1:padT,y2:padT+plotH,stroke:'#00000030',strokeDasharray:'3 3'})); kids.push(h('circle',{key:'dc',cx:x,cy:Y(v),r:4.5,fill:'#fff',stroke:color,strokeWidth:2.5})); const tw=150,thh=48; let tx=x+12; if(tx+tw>viewW) tx=x-12-tw; const ty=padT+6; kids.push(h('rect',{key:'tr',x:tx,y:ty,width:tw,height:thh,rx:9,fill:'#17140F',opacity:0.97})); kids.push(h('text',{key:'td',x:tx+13,y:ty+20,fontSize:11.5,fill:'#b8b2a8',fontFamily:'IBM Plex Mono, monospace'}, this.longDate(this.dates[idx0+i]))); kids.push(h('text',{key:'tv',x:tx+13,y:ty+40,fontSize:15,fontWeight:600,fill:'#fff',fontFamily:'IBM Plex Mono, monospace'}, 'R$ '+this.fmt(v))); }
+    kids.push(h('rect',{key:'ov',x:padL,y:padT,width:plotW,height:plotH,fill:'transparent',
+      onMouseMove:(e)=>{ const svg=e.currentTarget.ownerSVGElement; const r=svg.getBoundingClientRect(); const relX=(e.clientX-r.left)/r.width*viewW; let frac=(relX-padL)/plotW; let i=Math.round(frac*(n-1)); i=Math.max(0,Math.min(n-1,i)); this.setState({dHover:{index:i}}); },
+      onMouseLeave:()=>this.setState({dHover:null}) }));
+    return h('svg',{viewBox:`0 0 ${viewW} ${viewH}`, style:{width:'100%',height:'auto',display:'block',touchAction:'none'}, preserveAspectRatio:'xMidYMid meet'}, kids);
+  }
+
+  openDetail(id){ this.setState({view:'detail', selected:id, dHover:null, dPeriod:90, showAlertForm:false}); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  closeDetail(){ this.setState({view:'dashboard', showAlertForm:false}); if(typeof window!=='undefined') window.scrollTo(0,0); }
+  toggleActive(id){ this.setState(s=>({active:{...s.active,[id]:!s.active[id]}})); }
+  setSort(key){ this.setState(s=>{ if(s.sortKey===key) return {sortDir:-s.sortDir}; return {sortKey:key, sortDir: key==='nome'?1:-1}; }); }
+  toggleAlertForm(){ this.setState(s=>({showAlertForm:!s.showAlertForm, editingAlert:null, alertDraft:{cultureId:'soja',direction:'above',target:''}})); }
+  openAlertFor(id){ this.setState({showAlertForm:true, editingAlert:null, alertDraft:{cultureId:id,direction:'above',target:''}}); }
+  editAlert(id){ const a=this.state.alerts.find(x=>x.id===id); if(!a) return; this.setState({showAlertForm:true, editingAlert:id, alertDraft:{cultureId:a.cultureId, direction:a.direction, target:String(a.target).replace('.',',')}}); }
+  removeAlert(id){ this.setState(s=>({alerts:s.alerts.filter(x=>x.id!==id)})); }
+  saveAlert(){ const d=this.state.alertDraft; const t=parseFloat(String(d.target).replace(/\./g,'').replace(',','.')); if(!d.target || isNaN(t)) return; this.setState(s=>{ if(s.editingAlert){ return {alerts:s.alerts.map(a=>a.id===s.editingAlert?{...a,cultureId:d.cultureId,direction:d.direction,target:t}:a), showAlertForm:false, editingAlert:null}; } return {alerts:[...s.alerts,{id:s.nextId,cultureId:d.cultureId,direction:d.direction,target:t}], nextId:s.nextId+1, showAlertForm:false}; }); }
+  setDraftCulture(e){ const v=e.target.value; this.setState(s=>({alertDraft:{...s.alertDraft,cultureId:v}})); }
+  setDraftDirection(e){ const v=e.target.value; this.setState(s=>({alertDraft:{...s.alertDraft,direction:v}})); }
+  setDraftTarget(e){ const v=e.target.value; this.setState(s=>({alertDraft:{...s.alertDraft,target:v}})); }
+  setRegion(e){ const v=e.target.value; this.setState({region:v}); }
+
+  renderVals(){
+    const S=this.state; const region=this.REGIONS.find(r=>r.id===S.region)||this.REGIONS[0]; const M=this.computeMetrics(region.id); const green='#0F7A43', red='#C0392B';
+    const colOf=v=>v>=0?green:red; const bgOf=v=>v>=0?'rgba(15,122,67,0.10)':'rgba(192,57,43,0.10)';
+
+    const cards=this.CULTS.map(c=>{ const mm=M[c.id]; const up=mm.day>=0; return {id:c.id, nome:c.nome, unit:c.unit, color:this.COLORS[c.id], _day:mm.day, priceFmt:this.fmt(mm.cur), dayFmt:this.pct(mm.day), arrow:up?'▲':'▼', dayColor:colOf(mm.day), dayBg:bgOf(mm.day), spark:this.makeSpark(mm.series.slice(-7), up, 200, 44), sparkMini:this.makeSpark(mm.series.slice(-7), up, 72, 26), sparkBig:this.makeSpark(mm.series.slice(-30), up, 340, 96), open:()=>this.openDetail(c.id)}; });
+    let bi=0; cards.forEach((c,i)=>{ if(Math.abs(c._day)>Math.abs(cards[bi]._day)) bi=i; }); const feat=cards[bi]; const others=cards.filter((_,i)=>i!==bi);
+
+    let rows=this.CULTS.map(c=>{ const mm=M[c.id]; return {id:c.id, nome:c.nome, unit:c.unit, color:this.COLORS[c.id], price:mm.cur, dayPct:mm.day, weekPct:mm.week, monthPct:mm.month, praca:region.nome, dataStr:this.shortDate(this.dates[this.dates.length-1])+'/26'}; });
+    const k=S.sortKey; rows.sort((a,b)=>{ let av=a[k], bv=b[k]; if(typeof av==='string') return av.localeCompare(bv)*S.sortDir; return (av-bv)*S.sortDir; });
+    const tableRows=rows.map(r=>({...r, priceFmt:this.fmt(r.price), dayFmt:this.pct(r.dayPct), weekFmt:this.pct(r.weekPct), monthFmt:this.pct(r.monthPct), dayColor:colOf(r.dayPct), weekColor:colOf(r.weekPct), monthColor:colOf(r.monthPct), open:()=>this.openDetail(r.id)}));
+    const ind=key=> S.sortKey===key ? (S.sortDir===1?' ↑':' ↓') : '';
+
+    const chips=this.CULTS.map(c=>{ const on=!!S.active[c.id]; return {nome:c.nome, dot:this.COLORS[c.id], toggle:()=>this.toggleActive(c.id), style:`display:inline-flex;align-items:center;gap:7px;border:1px solid ${on?this.COLORS[c.id]:'#D8D3CB'};background:${on?'#fff':'transparent'};color:${on?'#17140F':'#a09a90'};border-radius:20px;padding:6px 13px;font-size:12.5px;font-weight:${on?600:500};cursor:pointer;font-family:inherit;opacity:${on?1:0.65};transition:all .15s`}; });
+
+    const periods=[[7,'7 dias'],[30,'30 dias'],[90,'90 dias'],[365,'1 ano']].map(a=>({label:a[1], style:this.seg(S.period===a[0]), onClick:()=>this.setState({period:a[0], hover:null})}));
+    const dPeriods=[[7,'7 dias'],[30,'30 dias'],[90,'90 dias'],[365,'1 ano']].map(a=>({label:a[1], style:this.seg(S.dPeriod===a[0]), onClick:()=>this.setState({dPeriod:a[0], dHover:null})}));
+    const yModes=[['pct','Variação %'],['brl','R$/saca']].map(a=>({label:a[1], style:this.seg(S.yMode===a[0]), onClick:()=>this.setState({yMode:a[0]})}));
+    const cardStyles=[['a','Confortável'],['b','Compacto'],['c','Destaque']].map(a=>({label:a[1], style:this.seg(S.cardStyle===a[0]), onClick:()=>this.setState({cardStyle:a[0]})}));
+
+    const nameOf=id=>{ const c=this.CULTS.find(x=>x.id===id); return c?c.nome:id; };
+    const alertList=S.alerts.map(a=>{ const cur=M[a.cultureId].cur; const trig=a.direction==='above'? cur>=a.target : cur<=a.target; return {id:a.id, cid:a.cultureId, nome:nameOf(a.cultureId), color:this.COLORS[a.cultureId], condText:(a.direction==='above'?'acima de':'abaixo de'), condLabel:(a.direction==='above'?'Subir acima de':'Cair abaixo de'), targetFmt:this.fmt(a.target), curFmt:this.fmt(cur), triggered:trig, statusText:trig?'Disparado':'Monitorando', statusDot:'●', statusColor:trig?red:green, statusBg:trig?bgOf(-1):bgOf(1), edit:()=>this.editAlert(a.id), remove:()=>this.removeAlert(a.id)}; });
+
+    let detail=null;
+    if(S.view==='detail' && S.selected){ const cid=S.selected; const cc=this.CULTS.find(x=>x.id===cid); const mm=M[cid]; const up=mm.day>=0; const win=mm.series.slice(-S.dPeriod); const dmin=Math.min.apply(null,win), dmax=Math.max.apply(null,win), davg=win.reduce((x,y)=>x+y,0)/win.length; const rec=[]; const s=mm.series; for(let i=s.length-6;i<s.length;i++){ const ch=(s[i]/s[i-1]-1)*100; rec.push({dateStr:this.shortDate(this.dates[i])+'/26', priceFmt:this.fmt(s[i]), chFmt:this.pct(ch), chColor:colOf(ch)}); } rec.reverse(); const dAl=alertList.filter(x=>x.cid===cid); detail={ id:cid, nome:cc.nome, unit:cc.unit, praca:region.nome, color:this.COLORS[cid], priceFmt:this.fmt(mm.cur), dayFmt:this.pct(mm.day), dayColor:colOf(mm.day), dayBg:bgOf(mm.day), dayArrow:up?'▲':'▼', weekFmt:this.pct(mm.week), weekColor:colOf(mm.week), monthFmt:this.pct(mm.month), monthColor:colOf(mm.month), minFmt:this.fmt(dmin), maxFmt:this.fmt(dmax), avgFmt:this.fmt(davg), chart:this.makeDetailChart(cid,M,S), recent:rec, alerts:dAl, noAlerts:dAl.length===0, openAlert:()=>this.openAlertFor(cid) }; }
+
+    const hints={ pct:'Variação % desde o início do período — melhor para comparar culturas de preços diferentes (ex.: café e milho).', brl:'Preço absoluto em R$ — escalas muito diferentes entre culturas.' };
+
+    return {
+      updatedLabel: this.props.updatedLabel ?? 'Hoje, 08/07/2026 · 18h30',
+      region: S.region, setRegion:(e)=>this.setRegion(e), regionOpts:this.REGIONS.map(r=>({id:r.id,nome:r.nome})), pracaName:region.nome,
+      isDashboard:S.view==='dashboard', isDetail:S.view==='detail',
+      styleA:S.cardStyle==='a', styleB:S.cardStyle==='b', styleC:S.cardStyle==='c',
+      cardStyles, cards, feat, others,
+      periods, dPeriods, yModes, chips, yModeHint:hints[S.yMode],
+      mainChartEl:this.makeMainChart(M,S),
+      tableRows, sortNome:()=>this.setSort('nome'), sortPrice:()=>this.setSort('price'), sortDay:()=>this.setSort('dayPct'), sortWeek:()=>this.setSort('weekPct'), sortMonth:()=>this.setSort('monthPct'),
+      indNome:ind('nome'), indPrice:ind('price'), indDay:ind('dayPct'), indWeek:ind('weekPct'), indMonth:ind('monthPct'),
+      alertList, noAlerts:alertList.length===0,
+      toggleAlertForm:()=>this.toggleAlertForm(), alertBtnLabel:S.showAlertForm?'Fechar':'+ Novo alerta', showAlertForm:S.showAlertForm,
+      cultureOpts:this.CULTS.map(c=>({id:c.id,nome:c.nome})),
+      draftCulture:S.alertDraft.cultureId, draftDirection:S.alertDraft.direction, draftTarget:S.alertDraft.target,
+      setDraftCulture:(e)=>this.setDraftCulture(e), setDraftDirection:(e)=>this.setDraftDirection(e), setDraftTarget:(e)=>this.setDraftTarget(e),
+      saveAlert:()=>this.saveAlert(), cancelAlert:()=>this.setState({showAlertForm:false, editingAlert:null}), saveLabel:S.editingAlert?'Salvar alterações':'Criar alerta',
+      closeDetail:()=>this.closeDetail(), detail,
+    };
+  }
+}
+</script>
+</body>
+</html>
