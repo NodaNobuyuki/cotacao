@@ -55,6 +55,20 @@ describe("parseCepeaXls", () => {
     ]);
   });
 
+  it('accepts "Média" as the value column, as the carcaça suína sheet uses', () => {
+    const xls = buildXls([
+      ["Suíno | PREÇOS DA CARCAÇA SUÍNA ESPECIAL (R$/kg)"],
+      ["Data", "Média"],
+      ["10/07/2026", "9,85"],
+    ]);
+
+    const parsed = parseCepeaXls(xls);
+
+    // The unit is embedded in the title as "(R$/kg)" — the paren is not a unit.
+    expect(parsed.unidade).toBe("R$/kg");
+    expect(parsed.rows).toEqual([{ data: "2026-07-10", valor: 9.85 }]);
+  });
+
   it("skips junk rows instead of emitting NaN prices", () => {
     const xls = buildXls([
       ["Boi | INDICADOR"],

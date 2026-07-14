@@ -56,22 +56,30 @@ export default async function DashboardPage({
     return <EmptyState />;
   }
 
-  const params = parseDashboardParams(
-    sp,
-    regions.map((r) => r.id),
-    crops.map((c) => c.id),
-  );
+  const regionIds = regions.map((r) => r.id);
+  const requested = parseDashboardParams(sp, regionIds, crops.map((c) => c.id));
 
   const [series, latestDate, sources] = await Promise.all([
-    seriesByCrop(params.region, params.period),
-    latestQuoteDate(params.region),
-    sourcesForRegion(params.region),
+    seriesByCrop(requested.region, requested.period),
+    latestQuoteDate(requested.region),
+    sourcesForRegion(requested.region),
   ]);
 
-  const snapshots = buildSnapshots(crops, series);
+  // CEPEA does not publish every crop in every praça — there is no trigo
+  // indicator for São Paulo, nor café for Paraná. Chips and selections are
+  // therefore scoped to what this praça actually has, so no control on screen
+  // is a dead toggle that silently plots nothing.
+  const cropsHere = crops.filter((c) => (series.get(c.id)?.length ?? 0) > 0);
+  const params = parseDashboardParams(
+    sp,
+    regionIds,
+    cropsHere.map((c) => c.id),
+  );
+
+  const snapshots = buildSnapshots(cropsHere, series);
   const sorted = sortSnapshots(snapshots, params.sortKey, params.sortDir);
   const chartSeries = buildChartSeries(
-    crops,
+    cropsHere,
     series,
     params.selected,
     params.period,
@@ -162,7 +170,7 @@ export default async function DashboardPage({
             </div>
           </div>
 
-          <CropChips crops={crops} params={params} />
+          <CropChips crops={cropsHere} params={params} />
           <ComparisonChart series={chartSeries} metric={params.metric} />
         </section>
 

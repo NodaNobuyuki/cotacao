@@ -19,7 +19,9 @@
     "ingest:cepea": "tsx scripts/ingest-cepea.ts",
     "ingest:daily": "tsx scripts/ingest-daily.ts",
     "db:drop-synthetic": "tsx scripts/drop-synthetic.ts",
-    "db:reset": "tsx scripts/reset.ts && npm run db:migrate && npm run db:seed"
+    "db:reset": "tsx scripts/reset.ts && npm run db:migrate && npm run db:seed",
+    "db:prune": "tsx scripts/prune-catalog.ts",
+    "cepea:series": "tsx scripts/explore-series.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",

@@ -53,10 +53,11 @@ export function parseCepeaXls(file: Buffer): ParsedXls {
   const header = grid[headerIndex] ?? [];
 
   const dateCol = header.findIndex(isDataHeaderCell);
+  // Value column headers seen in the wild: "Valor", "À vista R$", "Média".
   const brlCol = header.findIndex(
     (cell) =>
       typeof cell === "string" &&
-      /(^valor$|r\$|pre[çc]o)/i.test(cell.trim()) &&
+      /(^valor$|^m[ée]dia$|r\$|pre[çc]o)/i.test(cell.trim()) &&
       !/us\$|d[óo]lar/i.test(cell),
   );
   const usdCol = header.findIndex(
@@ -136,7 +137,9 @@ export function extractUnidade(cells: readonly Cell[]): string {
     const text = cell.trim();
     if (/^data$/i.test(text)) continue;
 
-    const explicit = /R\$\s*\/\s*[^\s,;]+(\s+de\s+\d+\s*\w+)?/i.exec(text);
+    // Trailing ")" matters: série names embed the unit as "(R$/kg)", and
+    // capturing the paren yields the nonsense unit "R$/kg)".
+    const explicit = /R\$\s*\/\s*[^\s,;)]+(\s+de\s+\d+\s*\w+)?/i.exec(text);
     if (explicit !== null) return explicit[0].replace(/\s+/g, " ").trim();
 
     const nota = /\bpor\s+(arroba|saca(\s+de\s+[\d.,]+\s*kg)?|kg|quilo|tonelada|litro|d[úu]zia|caixa|cabe[çc]a|@)/i.exec(

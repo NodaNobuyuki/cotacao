@@ -115,5 +115,28 @@ Regra do mapeamento: **uma série por (cultura, praça)**. O índice único é
 uma sobrescrever a outra silenciosamente — por isso a série "Boi Gordo - Média
 a Prazo" (segunda metodologia para o mesmo boi, no mesmo estado) fica de fora.
 
-Séries mapeadas hoje: boi gordo (SP), soja (PR e Paranaguá), milho (SP). As
-praças são as do CEPEA, não uma lista arrumadinha de UFs.
+### Catálogo (SP e PR)
+
+| Praça | Culturas |
+| --- | --- |
+| São Paulo | boi gordo, milho, café arábica, suíno vivo, frango congelado, bezerro |
+| Paraná | soja, trigo, suíno vivo |
+
+A cobertura é assimétrica **porque o CEPEA é assim**: não existe indicador de
+trigo para SP nem de café para o PR. O painel mostra só as culturas com cotação
+na praça selecionada — nada de chip que não plota nada.
+
+Só entram séries **diárias**, porque as variações do painel ("dia", "7d", "30d")
+só significam o que dizem numa série diária. Ficaram de fora, de propósito:
+
+- **leite ao produtor** (SP e PR): mensal. Muito relevante ao produtor — entra
+  quando a UI souber exibir cadência, senão a coluna "Dia" mostraria variação
+  mês a mês.
+- **feijão** (CEPEA/CNA): publicação irregular (2 cotações em 13 dias).
+- **algodão, arroz, açúcar, etanol, mandioca, tilápia**: ou a praça não é SP/PR,
+  ou o preço é de usina/indústria, não do produtor.
+
+Para ver o que o CEPEA publica hoje, com periodicidade: `npm run cepea:series`.
+
+As unidades não são chutadas — vêm da planilha do próprio CEPEA (trigo é
+**R$/tonelada**, bezerro é **R$/cabeça**).

@@ -43,7 +43,10 @@ export interface CepeaSourceConfig {
   /** Cloudflare tends to block headless browsers; default false (headed). */
   readonly headless?: boolean;
   readonly challengeTimeoutMs?: number;
-  /** CEPEA periodicity code; "1" = daily. */
+  /**
+   * Forces one periodicity for every série. Leave unset (the default) to use
+   * the finest one each série actually publishes — see `pickPeriodicidade`.
+   */
   readonly periodicidade?: string;
   readonly logger?: (message: string) => void;
 }
@@ -52,6 +55,33 @@ export interface CepeaSourceConfig {
 interface Especificacao {
   readonly id: string;
   readonly nome: string;
+  /** Periodicities CEPEA offers for this série, e.g. "1,3,4". See PERIODICIDADE. */
+  readonly periodicidade: string;
+}
+
+/** CEPEA's periodicity codes, taken from the radio group on the consulta page. */
+export const PERIODICIDADE = {
+  diaria: "1",
+  semanal: "2",
+  mensal: "3",
+  anual: "4",
+} as const;
+
+/**
+ * Not every série is published daily — leite is monthly, trigo weekly. Asking
+ * for a periodicity a série does not offer returns an empty sheet, so take the
+ * finest one it actually supports.
+ */
+export function pickPeriodicidade(supported: string): string {
+  const offered = supported.split(",").map((c) => c.trim());
+  for (const code of [
+    PERIODICIDADE.diaria,
+    PERIODICIDADE.semanal,
+    PERIODICIDADE.mensal,
+  ]) {
+    if (offered.includes(code)) return code;
+  }
+  return offered[0] ?? PERIODICIDADE.diaria;
 }
 
 const DEFAULTS = {
@@ -67,14 +97,16 @@ const DEFAULTS = {
   jitterMs: 2_000,
   headless: false,
   challengeTimeoutMs: 120_000,
-  periodicidade: "1",
 } as const;
 
 const CONSULTA_PATH = "/br/consultas-ao-banco-de-dados-do-site.aspx";
 const ESPECIFICACAO_PATH = "/br/indicador/listar_especificacao.aspx";
 
 export class CepeaHybridScraperSource implements PriceDataSource {
-  private readonly config: Required<Omit<CepeaSourceConfig, "logger">>;
+  private readonly config: Required<
+    Omit<CepeaSourceConfig, "logger" | "periodicidade">
+  > &
+    Pick<CepeaSourceConfig, "periodicidade">;
   private readonly log: (message: string) => void;
   private client: CepeaHttpClient | null = null;
 
@@ -116,6 +148,17 @@ export class CepeaHybridScraperSource implements PriceDataSource {
     return points;
   }
 
+  /**
+   * The séries CEPEA publishes for a product, without downloading any data.
+   * Used to discover what exists (and its tabela_id) before mapping it in
+   * adapter.ts.
+   */
+  async listSeries(
+    produtoId: string,
+  ): Promise<readonly { id: string; nome: string; periodicidade: string }[]> {
+    return this.listEspecificacoes(produtoId);
+  }
+
   private async listEspecificacoes(
     produtoId: string,
   ): Promise<Especificacao[]> {
@@ -135,7 +178,10 @@ export class CepeaHybridScraperSource implements PriceDataSource {
     const query = new URLSearchParams({
       tabela_id: spec.id,
       data_inicial: isoToBrDate(dataInicio),
-      periodicidade: this.config.periodicidade,
+      // Honour what the série publishes rather than demanding daily from a
+      // monthly indicator, which comes back as an empty sheet.
+      periodicidade:
+        this.config.periodicidade ?? pickPeriodicidade(spec.periodicidade),
       data_final: isoToBrDate(dataFim),
     });
     const consultaUrl = `${this.config.baseUrl}${CONSULTA_PATH}?${query.toString()}`;
@@ -278,12 +324,18 @@ function parseEspecificacoes(value: unknown): Especificacao[] {
     const record = item as Record<string, unknown>;
     const id = record["id"];
     const nome = record["nome"];
+    const periodicidade = record["periodicidade"];
     if (typeof id !== "string" && typeof id !== "number") {
       throw new Error("Especificação sem campo id.");
     }
     return {
+      // Ids are not always numeric: "129-6" (suíno PR), "leitep-SP" (leite SP).
       id: String(id),
       nome: typeof nome === "string" ? nome : "",
+      periodicidade:
+        typeof periodicidade === "string"
+          ? periodicidade
+          : PERIODICIDADE.diaria,
     };
   });
 }
