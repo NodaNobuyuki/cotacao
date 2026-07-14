@@ -6,6 +6,9 @@ build/
 # Local embedded Postgres (PGlite) data directory
 .pglite/
 
+# CEPEA ingestion artifacts: session cookies + raw .xls archive
+data/cepea/
+
 .env
 .env.local
 .env*.local

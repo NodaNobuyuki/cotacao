@@ -5,6 +5,7 @@ import { DataBanner } from "@/components/DataBanner";
 import { PriceTable } from "@/components/PriceTable";
 import { RegionSelect } from "@/components/RegionSelect";
 import { Segmented } from "@/components/Segmented";
+import { SourceFooter } from "@/components/SourceFooter";
 import {
   latestQuoteDate,
   listCrops,
@@ -91,7 +92,7 @@ export default async function DashboardPage({
           </div>
           <div>
             <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
-              Cotação do Campo
+              AgroPonto
             </p>
             <p className="text-xs text-ink-soft">Indicador diário por praça</p>
           </div>
@@ -180,6 +181,8 @@ export default async function DashboardPage({
           </div>
           <PriceTable snapshots={sorted} params={params} regionName={regionName} />
         </section>
+
+        <SourceFooter sources={sources} />
       </main>
     </div>
   );
@@ -191,8 +194,9 @@ function EmptyState() {
       <h1 className="text-xl font-semibold text-ink">Nenhuma cotação carregada</h1>
       <p className="text-sm text-ink-soft">
         O banco está vazio. Rode <code className="font-mono">npm run db:migrate</code> e{" "}
-        <code className="font-mono">npm run db:seed</code> para popular o painel
-        com dados sintéticos.
+        <code className="font-mono">npm run ingest:daily</code> para carregar as
+        cotações do CEPEA — ou <code className="font-mono">npm run db:seed</code>{" "}
+        para popular o painel com dados sintéticos.
       </p>
     </main>
   );
