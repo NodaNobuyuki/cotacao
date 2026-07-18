@@ -29,6 +29,10 @@ export interface DashboardParams {
   selected: string[];
   sortKey: SortKey;
   sortDir: SortDir;
+  /** Sale simulator: crop, past sale date and quantity. Absent until used. */
+  simCrop: string | undefined;
+  simDate: string | undefined;
+  simQty: number;
 }
 
 function one(v: string | string[] | undefined): string | undefined {
@@ -42,7 +46,14 @@ export const PARAM = {
   crops: "culturas",
   sortKey: "ordenar",
   sortDir: "dir",
+  // "?venda=soja&em=2026-03-01&qtd=100" reads as a sentence in Portuguese.
+  simCrop: "venda",
+  simDate: "em",
+  simQty: "qtd",
 } as const;
+
+export const SIM_QTY_DEFAULT = 100;
+const SIM_QTY_MAX = 1_000_000;
 
 export function parseDashboardParams(
   sp: SearchParams,
@@ -55,6 +66,9 @@ export function parseDashboardParams(
   const cropsRaw = one(sp[PARAM.crops]);
   const sortKey = one(sp[PARAM.sortKey]);
   const sortDir = one(sp[PARAM.sortDir]);
+  const simCrop = one(sp[PARAM.simCrop]);
+  const simDate = one(sp[PARAM.simDate]);
+  const simQty = Number(one(sp[PARAM.simQty]));
 
   // An explicit empty string means "no crops selected", which is a legitimate
   // state (the chart shows a prompt). Only an absent param takes the default.
@@ -76,6 +90,13 @@ export function parseDashboardParams(
     selected,
     sortKey: SORT_KEYS.includes(sortKey as SortKey) ? (sortKey as SortKey) : "dia",
     sortDir: sortDir === "asc" ? "asc" : "desc",
+    simCrop: simCrop && validCrops.includes(simCrop) ? simCrop : undefined,
+    simDate:
+      simDate && /^\d{4}-\d{2}-\d{2}$/.test(simDate) ? simDate : undefined,
+    simQty:
+      Number.isFinite(simQty) && simQty > 0
+        ? Math.min(simQty, SIM_QTY_MAX)
+        : SIM_QTY_DEFAULT,
   };
 }
 
@@ -95,6 +116,14 @@ export function buildHref(
   q.set(PARAM.crops, p.selected.join(","));
   if (p.sortKey !== "dia") q.set(PARAM.sortKey, p.sortKey);
   if (p.sortDir !== "desc") q.set(PARAM.sortDir, p.sortDir);
+
+  // The simulator params ride along on every dashboard link, so changing the
+  // period or sort order does not silently discard a simulation in progress.
+  if (p.simCrop) {
+    q.set(PARAM.simCrop, p.simCrop);
+    if (p.simDate) q.set(PARAM.simDate, p.simDate);
+    if (p.simQty !== SIM_QTY_DEFAULT) q.set(PARAM.simQty, String(p.simQty));
+  }
 
   return `/?${q.toString()}`;
 }

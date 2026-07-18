@@ -2,9 +2,11 @@ import { ComparisonChart } from "@/components/ComparisonChart";
 import { CropCard } from "@/components/CropCard";
 import { CropChips } from "@/components/CropChips";
 import { DataBanner } from "@/components/DataBanner";
+import { InsightCards } from "@/components/InsightCards";
 import { PriceTable } from "@/components/PriceTable";
 import { RegionSelect } from "@/components/RegionSelect";
 import { Segmented } from "@/components/Segmented";
+import { SellSimulator } from "@/components/SellSimulator";
 import { SourceFooter } from "@/components/SourceFooter";
 import {
   latestQuoteDate,
@@ -14,6 +16,7 @@ import {
   sourcesForRegion,
 } from "@/db/queries";
 import { buildChartSeries, buildSnapshots, sortSnapshots } from "@/domain/dashboard";
+import { buildInsights } from "@/domain/insights";
 import { formatLongDate } from "@/lib/format";
 import {
   buildHref,
@@ -59,8 +62,12 @@ export default async function DashboardPage({
   const regionIds = regions.map((r) => r.id);
   const requested = parseDashboardParams(sp, regionIds, crops.map((c) => c.id));
 
-  const [series, latestDate, sources] = await Promise.all([
+  // Insights read a fixed one-year window rather than the UI period, so
+  // "lowest in 3 months" does not appear and vanish as the user toggles the
+  // chart between 7 and 90 days.
+  const [series, yearSeries, latestDate, sources] = await Promise.all([
     seriesByCrop(requested.region, requested.period),
+    seriesByCrop(requested.region, 365),
     latestQuoteDate(requested.region),
     sourcesForRegion(requested.region),
   ]);
@@ -77,6 +84,7 @@ export default async function DashboardPage({
   );
 
   const snapshots = buildSnapshots(cropsHere, series);
+  const insights = buildInsights(cropsHere, yearSeries);
   const sorted = sortSnapshots(snapshots, params.sortKey, params.sortDir);
   const chartSeries = buildChartSeries(
     cropsHere,
@@ -139,6 +147,8 @@ export default async function DashboardPage({
           </div>
         </section>
 
+        <InsightCards insights={insights} />
+
         <section
           className="mt-[26px] rounded-[18px] border border-line bg-surface p-4 sm:p-6"
           aria-labelledby="comparativo"
@@ -189,6 +199,13 @@ export default async function DashboardPage({
           </div>
           <PriceTable snapshots={sorted} params={params} regionName={regionName} />
         </section>
+
+        <SellSimulator
+          crops={cropsHere}
+          series={yearSeries}
+          params={params}
+          latestDate={latestDate}
+        />
 
         <SourceFooter sources={sources} />
       </main>
