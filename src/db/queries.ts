@@ -94,3 +94,62 @@ export async function sourcesForRegion(regionId: string): Promise<string[]> {
     .where(eq(quotes.regionId, regionId));
   return rows.map((r) => r.source);
 }
+
+/**
+ * One crop's price history in one region, over a trailing window.
+ *
+ * Deliberately not `seriesByCrop(...).get(cropId)`: that scans every crop in
+ * the region and discards all but one, and its window is sized for the
+ * dashboard's needs, not the detail page's (up to 365 days). This seeks the
+ * (regionId, cropId, quoteDate) index directly.
+ */
+export async function quotesForCrop(
+  regionId: string,
+  cropId: string,
+  windowDays: number,
+  lookbackPadDays = 45,
+): Promise<Series> {
+  const db = await getDb();
+  const last = await latestQuoteDate(regionId);
+  if (!last) return [];
+
+  const from = shiftIsoDays(last, -(windowDays + lookbackPadDays));
+
+  const rows = await db
+    .select({
+      date: quotes.quoteDate,
+      price: sql<number>`${quotes.price}::double precision`,
+    })
+    .from(quotes)
+    .where(
+      and(
+        eq(quotes.regionId, regionId),
+        eq(quotes.cropId, cropId),
+        gte(quotes.quoteDate, from),
+      ),
+    )
+    .orderBy(asc(quotes.quoteDate));
+
+  return rows.map((r) => ({ date: r.date, price: Number(r.price) }));
+}
+
+/**
+ * Regions that carry at least one quote for this crop. CEPEA does not
+ * publish every crop everywhere (no trigo for São Paulo, no café for
+ * Paraná), so the crop detail page's region picker is scoped to this set
+ * rather than offering a region that would render nothing.
+ */
+export async function regionsForCrop(cropId: string): Promise<RegionMeta[]> {
+  const db = await getDb();
+  const rows = await db
+    .selectDistinct({
+      id: regions.id,
+      name: regions.name,
+      sortOrder: regions.sortOrder,
+    })
+    .from(quotes)
+    .innerJoin(regions, eq(quotes.regionId, regions.id))
+    .where(eq(quotes.cropId, cropId))
+    .orderBy(asc(regions.sortOrder));
+  return rows.map((r) => ({ id: r.id, name: r.name }));
+}

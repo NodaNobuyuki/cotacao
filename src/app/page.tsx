@@ -2,6 +2,7 @@ import { ComparisonChart } from "@/components/ComparisonChart";
 import { CropCard } from "@/components/CropCard";
 import { CropChips } from "@/components/CropChips";
 import { DataBanner } from "@/components/DataBanner";
+import { EmptyState } from "@/components/EmptyState";
 import { InsightCards } from "@/components/InsightCards";
 import { PriceTable } from "@/components/PriceTable";
 import { RegionSelect } from "@/components/RegionSelect";
@@ -19,6 +20,7 @@ import { buildChartSeries, buildSnapshots, sortSnapshots } from "@/domain/dashbo
 import { buildInsights } from "@/domain/insights";
 import { formatLongDate } from "@/lib/format";
 import {
+  buildCropHref,
   buildHref,
   METRICS,
   parseDashboardParams,
@@ -142,7 +144,7 @@ export default async function DashboardPage({
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(214px,1fr))] gap-[14px]">
             {snapshots.map((s) => (
-              <CropCard key={s.crop.id} snapshot={s} />
+              <CropCard key={s.crop.id} snapshot={s} href={buildCropHref(s.crop.id, params)} />
             ))}
           </div>
         </section>
@@ -210,19 +212,5 @@ export default async function DashboardPage({
         <SourceFooter sources={sources} />
       </main>
     </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-3 px-6 text-center">
-      <h1 className="text-xl font-semibold text-ink">Nenhuma cotação carregada</h1>
-      <p className="text-sm text-ink-soft">
-        O banco está vazio. Rode <code className="font-mono">npm run db:migrate</code> e{" "}
-        <code className="font-mono">npm run ingest:daily</code> para carregar as
-        cotações do CEPEA — ou <code className="font-mono">npm run db:seed</code>{" "}
-        para popular o painel com dados sintéticos.
-      </p>
-    </main>
   );
 }

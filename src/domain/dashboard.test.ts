@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildChartSeries, buildSnapshots, sortSnapshots } from "./dashboard";
+import { buildChartSeries, buildSnapshots, sortSnapshots, windowExtremes } from "./dashboard";
 import type { CropMeta, Series } from "./types";
 
 const crops: CropMeta[] = [
@@ -101,5 +101,27 @@ describe("buildChartSeries", () => {
   it("drops crops whose window has no quotes", () => {
     const out = buildChartSeries(crops, new Map(), ["soja"], 30, "pct");
     expect(out).toEqual([]);
+  });
+});
+
+describe("windowExtremes", () => {
+  it("returns undefined when the window has no quotes", () => {
+    expect(windowExtremes([], 30)).toBeUndefined();
+  });
+
+  it("restricts min/max to the calendar window, excluding older points", () => {
+    // soja: 100 on 06-08 (outside a 30-day window from 07-09), then 120/130/132.
+    expect(windowExtremes(soja, 30)).toEqual({ min: 120, max: 132 });
+    // The full series (including the 06-08 low of 100) is only visible with a
+    // wider window.
+    expect(windowExtremes(soja, 365)).toEqual({ min: 100, max: 132 });
+  });
+
+  it("returns a defined, equal range for a flat series", () => {
+    const flat: Series = [
+      { date: "2026-07-01", price: 50 },
+      { date: "2026-07-08", price: 50 },
+    ];
+    expect(windowExtremes(flat, 30)).toEqual({ min: 50, max: 50 });
   });
 });

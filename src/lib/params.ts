@@ -55,13 +55,21 @@ export const PARAM = {
 export const SIM_QTY_DEFAULT = 100;
 const SIM_QTY_MAX = 1_000_000;
 
+function parseRegion(sp: SearchParams, validRegions: readonly string[]): string {
+  const region = one(sp[PARAM.region]);
+  return region && validRegions.includes(region) ? region : (validRegions[0] ?? "");
+}
+
+function parsePeriod(sp: SearchParams): Period {
+  const period = Number(one(sp[PARAM.period]));
+  return (PERIODS as readonly number[]).includes(period) ? (period as Period) : 30;
+}
+
 export function parseDashboardParams(
   sp: SearchParams,
   validRegions: readonly string[],
   validCrops: readonly string[],
 ): DashboardParams {
-  const region = one(sp[PARAM.region]);
-  const period = Number(one(sp[PARAM.period]));
   const metric = one(sp[PARAM.metric]);
   const cropsRaw = one(sp[PARAM.crops]);
   const sortKey = one(sp[PARAM.sortKey]);
@@ -81,11 +89,8 @@ export function parseDashboardParams(
           .filter((id) => validCrops.includes(id));
 
   return {
-    region:
-      region && validRegions.includes(region) ? region : (validRegions[0] ?? ""),
-    period: (PERIODS as readonly number[]).includes(period)
-      ? (period as Period)
-      : 30,
+    region: parseRegion(sp, validRegions),
+    period: parsePeriod(sp),
     metric: METRICS.includes(metric as Metric) ? (metric as Metric) : "pct",
     selected,
     sortKey: SORT_KEYS.includes(sortKey as SortKey) ? (sortKey as SortKey) : "dia",
@@ -126,6 +131,35 @@ export function buildHref(
   }
 
   return `/?${q.toString()}`;
+}
+
+export interface CropDetailParams {
+  region: string;
+  period: Period;
+}
+
+export function parseCropDetailParams(
+  sp: SearchParams,
+  validRegions: readonly string[],
+): CropDetailParams {
+  return { region: parseRegion(sp, validRegions), period: parsePeriod(sp) };
+}
+
+/**
+ * `params` only needs `{region, period}` — a `DashboardParams` satisfies this
+ * shape too, so the dashboard can link into a crop's detail page with no
+ * conversion.
+ */
+export function buildCropHref(
+  cropId: string,
+  params: { region: string; period: Period },
+  overrides: Partial<{ region: string; period: Period }> = {},
+): string {
+  const p = { ...params, ...overrides };
+  const q = new URLSearchParams();
+  q.set(PARAM.region, p.region);
+  if (p.period !== 30) q.set(PARAM.period, String(p.period));
+  return `/culturas/${cropId}?${q.toString()}`;
 }
 
 /** Toggling a crop chip on or off. */

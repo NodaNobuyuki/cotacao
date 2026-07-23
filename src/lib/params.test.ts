@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { buildHref, nextSort, parseDashboardParams, toggleCrop } from "./params";
+import {
+  buildCropHref,
+  buildHref,
+  nextSort,
+  parseCropDetailParams,
+  parseDashboardParams,
+  toggleCrop,
+} from "./params";
 
 const REGIONS = ["PR", "MT", "SP"];
 const CROPS = ["soja", "milho", "cafe", "trigo"];
@@ -70,6 +77,38 @@ describe("buildHref", () => {
     const original = parse({ culturas: "" });
     const sp = Object.fromEntries(new URLSearchParams(buildHref(original).slice(2)));
     expect(parseDashboardParams(sp, REGIONS, CROPS).selected).toEqual([]);
+  });
+});
+
+describe("parseCropDetailParams", () => {
+  const parse = (sp: Record<string, string | undefined>) =>
+    parseCropDetailParams(sp, REGIONS);
+
+  it("falls back to sane defaults when nothing is supplied", () => {
+    expect(parse({})).toEqual({ region: "PR", period: 30 });
+  });
+
+  it("rejects an unknown region rather than querying for it", () => {
+    expect(parse({ praca: "XX" }).region).toBe("PR");
+  });
+
+  it("rejects a period that is not one of the offered windows", () => {
+    expect(parse({ periodo: "13" }).period).toBe(30);
+    expect(parse({ periodo: "365" }).period).toBe(365);
+  });
+});
+
+describe("buildCropHref", () => {
+  it("targets the crop's own path and omits the period at its default", () => {
+    const href = buildCropHref("soja", { region: "PR", period: 30 });
+    expect(href).toBe("/culturas/soja?praca=PR");
+  });
+
+  it("round-trips through parseCropDetailParams", () => {
+    const original = parseCropDetailParams({ praca: "MT", periodo: "365" }, REGIONS);
+    const href = buildCropHref("soja", original);
+    const sp = Object.fromEntries(new URLSearchParams(href.split("?")[1]));
+    expect(parseCropDetailParams(sp, REGIONS)).toEqual(original);
   });
 });
 

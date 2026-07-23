@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { CropSnapshot } from "@/domain/dashboard";
 import { formatPct, formatPrice, trendArrow, trendDirection } from "@/lib/format";
 import { Sparkline } from "./Sparkline";
@@ -26,34 +27,39 @@ export function DeltaPill({ value }: { value: number | undefined }) {
   );
 }
 
-export function CropCard({ snapshot }: { snapshot: CropSnapshot }) {
+export function CropCard({ snapshot, href }: { snapshot: CropSnapshot; href: string }) {
   const { crop, price, variation, spark } = snapshot;
 
   return (
-    <article className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-[18px]">
-      <div className="flex items-start justify-between">
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[15px] font-semibold text-ink">{crop.name}</h3>
-          <p className="mt-px whitespace-nowrap text-[11.5px] text-ink-faint">{crop.unit}</p>
+    <Link
+      href={href}
+      className="block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+    >
+      <article className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-[18px] transition-colors hover:border-ink-faint">
+        <div className="flex items-start justify-between">
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-[15px] font-semibold text-ink">{crop.name}</h3>
+            <p className="mt-px whitespace-nowrap text-[11.5px] text-ink-faint">{crop.unit}</p>
+          </div>
+          <span
+            aria-hidden="true"
+            className="mt-[3px] size-[11px] shrink-0 rounded-[3px]"
+            style={{ background: crop.colorHex }}
+          />
         </div>
-        <span
-          aria-hidden="true"
-          className="mt-[3px] size-[11px] shrink-0 rounded-[3px]"
-          style={{ background: crop.colorHex }}
-        />
-      </div>
 
-      <p className="text-[31px] font-semibold leading-none tracking-[-0.02em] text-ink">
-        <span className="mr-[3px] text-[15px] font-medium text-ink-faint">R$</span>
-        {formatPrice(price)}
-      </p>
+        <p className="text-[31px] font-semibold leading-none tracking-[-0.02em] text-ink">
+          <span className="mr-[3px] text-[15px] font-medium text-ink-faint">R$</span>
+          {formatPrice(price)}
+        </p>
 
-      <div className="flex items-center justify-between">
-        <DeltaPill value={variation.day} />
-        <span className="text-[11px] text-ink-faint">7 dias</span>
-      </div>
+        <div className="flex items-center justify-between">
+          <DeltaPill value={variation.day} />
+          <span className="text-[11px] text-ink-faint">7 dias</span>
+        </div>
 
-      <Sparkline values={spark} trend={trendDirection(variation.day)} />
-    </article>
+        <Sparkline values={spark} trend={trendDirection(variation.day)} />
+      </article>
+    </Link>
   );
 }
