@@ -1,3 +1,4 @@
+import { ArmSwitch } from "@/components/ArmSwitch";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { CropCard } from "@/components/CropCard";
 import { CropChips } from "@/components/CropChips";
@@ -101,19 +102,22 @@ export default async function DashboardPage({
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-line bg-canvas/85 px-4 py-[13px] backdrop-blur-md sm:px-6 lg:px-10">
-        <div className="flex items-center gap-3">
-          <div
-            aria-hidden="true"
-            className="flex size-10 items-center justify-center rounded-[11px] bg-ink font-mono text-lg font-bold text-white"
-          >
-            ◈
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div
+              aria-hidden="true"
+              className="flex size-10 items-center justify-center rounded-[11px] bg-ink font-mono text-lg font-bold text-white"
+            >
+              ◈
+            </div>
+            <div>
+              <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
+                AnalAgro
+              </p>
+              <p className="text-xs text-ink-soft">Indicador diário por praça</p>
+            </div>
           </div>
-          <div>
-            <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
-              AnalAgro
-            </p>
-            <p className="text-xs text-ink-soft">Indicador diário por praça</p>
-          </div>
+          <ArmSwitch active="precos" />
         </div>
 
         <div className="flex flex-wrap items-center gap-[18px]">

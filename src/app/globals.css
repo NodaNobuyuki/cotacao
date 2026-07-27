@@ -24,6 +24,18 @@
   --color-down: #c0392b;
   --color-accent: #7a4a38;
 
+  /*
+   * Weather semantics. The green/red of up and down does not carry over to
+   * climate — more rain is not "good" — so the arm's pair is water against
+   * deficit. These are hues, not roles, and stay global; the cold neutral ramp
+   * that goes with them is scoped to the arm in @layer base below.
+   */
+  --color-clima-agua: #2a6f97;
+  --color-clima-deficit: #bf6b30;
+  --color-clima-solo: #7d6a4f;
+  --color-clima-favoravel: #4a7c59;
+  --color-clima-alerta: #b4472e;
+
   --font-sans: var(--font-plex-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
@@ -39,6 +51,32 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /*
+   * The weather arm re-points the neutral ramp at a cold instrument-panel
+   * base, so it is not read as the price arm. Rebinding the role tokens rather
+   * than introducing a parallel set of utilities means every shared control —
+   * the arm switch, the segmented control, the selects — follows the arm it is
+   * rendered in without knowing the arm exists.
+   */
+  [data-arm="clima"] {
+    --color-canvas: #eaeff2;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f3f7f9;
+    --color-segment: #dbe4ea;
+
+    --color-ink: #0e181c;
+    --color-ink-muted: #5c6f77;
+    --color-ink-faint: #93a4ab;
+
+    --color-line: #d7e1e7;
+
+    /* Derived, not in the palette spec: the shared components use these three
+       roles, and leaving them warm would leak the price ramp into the panel. */
+    --color-ink-soft: #778991;
+    --color-line-soft: #e4edf1;
+    --color-line-input: #c9d4db;
   }
 
   /* Prices must align digit-for-digit down a column. */
