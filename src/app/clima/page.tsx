@@ -66,7 +66,7 @@ export default async function ClimaPage({
             </div>
             <div>
               <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
-                AnalAgro
+                AgroPrice
               </p>
               <p className="text-xs text-ink-soft">Clima por município</p>
             </div>
