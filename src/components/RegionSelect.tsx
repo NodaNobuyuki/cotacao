@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import type { RegionMeta } from "@/db/queries";
 import { buildCropHref, buildHref, type CropDetailParams, type DashboardParams } from "@/lib/params";
+import { SELECT_CLASS } from "./field-styles";
 
 /**
  * The one control that genuinely needs client JavaScript: a <select> cannot be
@@ -26,7 +27,7 @@ export function RegionSelect(
   const [pending, startTransition] = useTransition();
 
   return (
-    <label className="flex flex-col gap-[3px]">
+    <label className="flex min-w-0 flex-1 flex-col gap-[3px] sm:flex-none">
       <span className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
         Praça de negociação
       </span>
@@ -40,7 +41,7 @@ export function RegionSelect(
             : buildHref(params as DashboardParams, { region });
           startTransition(() => router.push(href));
         }}
-        className="min-w-[180px] cursor-pointer rounded-[9px] border border-line-input bg-surface px-[11px] py-2 text-[13.5px] font-medium text-ink disabled:opacity-60"
+        className={`${SELECT_CLASS} sm:min-w-[180px]`}
       >
         {regions.map((r) => (
           <option key={r.id} value={r.id}>

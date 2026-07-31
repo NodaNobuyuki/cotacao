@@ -33,12 +33,12 @@ export function SoilProfile({ point }: { point: WeatherPoint }) {
           return (
             <li
               key={`${layer.profundidadeTopoCm}-${layer.profundidadeBaseCm}`}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2 sm:gap-3"
               // Thickness is proportional, with a floor so ICON's 0-1cm band
               // stays readable rather than collapsing to a hairline.
               style={{ minHeight: `${Math.max((espessura / fundo) * 120, 26)}px` }}
             >
-              <span className="w-[74px] shrink-0 text-right font-mono text-[11px] text-ink-muted">
+              <span className="w-[62px] shrink-0 text-right font-mono text-[11px] text-ink-muted sm:w-[74px]">
                 {layer.profundidadeTopoCm}–{layer.profundidadeBaseCm}cm
               </span>
               <span className="h-[18px] flex-1 overflow-hidden rounded-[5px] bg-segment">
@@ -47,7 +47,7 @@ export function SoilProfile({ point }: { point: WeatherPoint }) {
                   style={{ width: `${preenchimento}%` }}
                 />
               </span>
-              <span className="w-[86px] shrink-0 font-mono text-[11.5px] text-ink">
+              <span className="w-[74px] shrink-0 font-mono text-[11.5px] text-ink sm:w-[86px]">
                 {layer.umidade === null ? (
                   <span className="text-ink-faint">sem dado</span>
                 ) : (

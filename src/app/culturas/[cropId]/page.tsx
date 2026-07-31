@@ -93,15 +93,16 @@ export default async function CropDetailPage({
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-line bg-canvas/85 px-4 py-[13px] backdrop-blur-md sm:px-6 lg:px-10">
+      {/* Same two-row split as the dashboard; see the comment there. */}
+      <header className="sticky top-0 z-30 flex flex-col gap-2.5 border-b border-line bg-canvas/85 px-4 py-2.5 backdrop-blur-md sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-[13px] lg:px-10">
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"
             className="size-[11px] shrink-0 rounded-[3px]"
             style={{ background: crop.colorHex }}
           />
-          <div>
-            <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
+          <div className="min-w-0">
+            <p className="truncate text-[15.5px] font-semibold tracking-[-0.01em] text-ink sm:text-[16.5px]">
               {crop.name}
             </p>
             <Link href="/" className="text-xs text-ink-soft underline underline-offset-2">
@@ -110,8 +111,8 @@ export default async function CropDetailPage({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-[18px]">
-          <div className="text-right leading-[1.35]">
+        <div className="flex items-end gap-3 sm:flex-wrap sm:items-center sm:gap-[18px]">
+          <div className="order-last shrink-0 leading-[1.35] sm:order-none sm:text-right">
             <p className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
               Última cotação
             </p>

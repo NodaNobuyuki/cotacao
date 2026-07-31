@@ -4,14 +4,14 @@ import type { CropMeta, Series } from "@/domain/types";
 import { formatLongDate, formatPrice } from "@/lib/format";
 import { PARAM, SIM_QTY_DEFAULT, type DashboardParams } from "@/lib/params";
 import { DeltaPill } from "./CropCard";
+import { FIELD_CLASS } from "./field-styles";
 
 /** "R$/arroba" → "arroba"; the quantity input is denominated in that. */
 function quantityUnit(unit: string): string {
   return unit.replace(/^R\$\s*\/\s*/, "");
 }
 
-const inputClass =
-  "rounded-[9px] border border-line-input bg-surface px-[11px] py-2 text-[13.5px] font-medium text-ink";
+const inputClass = `${FIELD_CLASS} w-full`;
 
 /**
  * "What if I had sold on date X?" — a plain GET form; crop, date and quantity
@@ -62,7 +62,14 @@ export function SellSimulator({
         </p>
       </div>
 
-      <form method="get" action="/" className="flex flex-wrap items-end gap-3">
+      {/* A two-column grid on a phone: wrapping a flex row put one control per
+          line and pushed the submit button below the fold. Cultura and the
+          button span both columns; the date and quantity pair up. */}
+      <form
+        method="get"
+        action="/"
+        className="grid grid-cols-2 items-end gap-3 sm:flex sm:flex-wrap"
+      >
         <input type="hidden" name={PARAM.region} value={params.region} />
         <input type="hidden" name={PARAM.crops} value={params.selected.join(",")} />
         {params.period !== 30 && (
@@ -78,14 +85,14 @@ export function SellSimulator({
           <input type="hidden" name={PARAM.sortDir} value={params.sortDir} />
         )}
 
-        <label className="flex flex-col gap-[3px]">
+        <label className="col-span-2 flex flex-col gap-[3px] sm:col-auto">
           <span className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
             Cultura
           </span>
           <select
             name={PARAM.simCrop}
             defaultValue={crop?.id ?? crops[0]!.id}
-            className={`${inputClass} min-w-[160px] cursor-pointer`}
+            className={`${inputClass} cursor-pointer sm:w-auto sm:min-w-[160px]`}
           >
             {crops.map((c) => (
               <option key={c.id} value={c.id}>
@@ -95,7 +102,7 @@ export function SellSimulator({
           </select>
         </label>
 
-        <label className="flex flex-col gap-[3px]">
+        <label className="flex min-w-0 flex-col gap-[3px]">
           <span className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
             Data da venda
           </span>
@@ -106,12 +113,12 @@ export function SellSimulator({
             min={minDate}
             max={latestDate}
             required
-            className={inputClass}
+            className={`${inputClass} sm:w-auto`}
           />
         </label>
 
-        <label className="flex flex-col gap-[3px]">
-          <span className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
+        <label className="flex min-w-0 flex-col gap-[3px]">
+          <span className="truncate text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
             Quantidade{unit ? ` (${unit})` : ""}
           </span>
           <input
@@ -121,13 +128,13 @@ export function SellSimulator({
             placeholder={String(SIM_QTY_DEFAULT)}
             min="0.01"
             step="any"
-            className={`${inputClass} w-[120px]`}
+            className={`${inputClass} sm:w-[120px]`}
           />
         </label>
 
         <button
           type="submit"
-          className="rounded-[9px] bg-ink px-4 py-2 text-[13.5px] font-semibold text-white"
+          className="col-span-2 min-h-11 rounded-[9px] bg-ink px-4 text-[13.5px] font-semibold text-white sm:col-auto sm:min-h-0 sm:py-2"
         >
           Simular
         </button>

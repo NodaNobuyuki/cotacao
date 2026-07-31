@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { LOCAIS } from "@/sources/weather";
 import { buildWeatherHref, type WeatherParams } from "@/lib/weather-params";
+import { SELECT_CLASS } from "./field-styles";
 
 /**
  * Location picker for the weather arm. Like RegionSelect, this is one of the
@@ -22,7 +23,7 @@ export function LocalSelect({ params }: { params: WeatherParams }) {
   const ufs = [...new Set(LOCAIS.map((l) => l.uf))];
 
   return (
-    <label className="flex flex-col gap-[3px]">
+    <label className="flex min-w-0 flex-1 flex-col gap-[3px] sm:flex-none">
       <span className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
         Local
       </span>
@@ -33,7 +34,7 @@ export function LocalSelect({ params }: { params: WeatherParams }) {
           const href = buildWeatherHref(params, { local: e.target.value });
           startTransition(() => router.push(href));
         }}
-        className="min-w-[200px] cursor-pointer rounded-[9px] border border-line-input bg-surface px-[11px] py-2 text-[13.5px] font-medium text-ink disabled:opacity-60"
+        className={`${SELECT_CLASS} sm:min-w-[200px]`}
       >
         {ufs.map((uf) => (
           <optgroup key={uf} label={uf === "SP" ? "São Paulo" : "Paraná"}>

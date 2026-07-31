@@ -28,7 +28,7 @@ export function CropChips({
             aria-pressed={on}
             role="button"
             className={[
-              "inline-flex items-center gap-[7px] rounded-full border px-[13px] py-1.5 text-[12.5px] transition-all",
+              "inline-flex min-h-10 items-center gap-[7px] rounded-full border px-[13px] text-[12.5px] transition-all sm:min-h-0 sm:py-1.5",
               on
                 ? "border-current bg-surface font-semibold text-ink opacity-100"
                 : "border-line-input bg-transparent font-medium text-ink-faint opacity-65 hover:opacity-90",

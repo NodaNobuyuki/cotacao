@@ -31,7 +31,8 @@ export function Segmented({
           scroll={false}
           aria-current={o.active ? "true" : undefined}
           className={[
-            "whitespace-nowrap rounded-lg px-[13px] py-1.5 text-[12.5px] transition-all",
+            // 40px tall on touch, back to the compact desktop height at sm.
+            "inline-flex min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-[13px] text-[12.5px] transition-all sm:min-h-0 sm:py-1.5",
             o.active
               ? "bg-surface font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.12)]"
               : "font-medium text-ink-muted hover:text-ink",

@@ -55,26 +55,31 @@ export default async function ClimaPage({
     // data-arm re-points the neutral tokens at the cold weather ramp for
     // everything below it, shared controls included. See globals.css.
     <div data-arm="clima" className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-line bg-canvas/85 px-4 py-[13px] backdrop-blur-md sm:px-6 lg:px-10">
-        <div className="flex items-center gap-4">
+      {/* Same two-row split as the price arm; see the comment there. */}
+      <header className="sticky top-0 z-30 flex flex-col gap-2.5 border-b border-line bg-canvas/85 px-4 py-2.5 backdrop-blur-md sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-[13px] lg:px-10">
+        <div className="flex items-center justify-between gap-4 sm:justify-start">
           <div className="flex items-center gap-3">
             <div
               aria-hidden="true"
-              className="flex size-10 items-center justify-center rounded-[11px] bg-ink font-mono text-lg font-bold text-white"
+              className="flex size-9 items-center justify-center rounded-[11px] bg-ink font-mono text-base font-bold text-white sm:size-10 sm:text-lg"
             >
               ◈
             </div>
             <div>
-              <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
-                AgroPrice
+              <p className="text-[15.5px] font-semibold tracking-[-0.01em] text-ink sm:text-[16.5px]">
+                AgroWeather
               </p>
-              <p className="text-xs text-ink-soft">Clima por município</p>
+              <p className="hidden text-xs text-ink-soft sm:block">
+                Clima por município
+              </p>
             </div>
           </div>
           <ArmSwitch active="clima" />
         </div>
 
-        <LocalSelect params={params} />
+        <div className="flex">
+          <LocalSelect params={params} />
+        </div>
       </header>
 
       <main

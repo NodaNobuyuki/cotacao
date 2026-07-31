@@ -101,27 +101,32 @@ export default async function DashboardPage({
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-line bg-canvas/85 px-4 py-[13px] backdrop-blur-md sm:px-6 lg:px-10">
-        <div className="flex items-center gap-4">
+      {/* Two rows on a phone — brand + arm switch, then the controls — because
+          a single wrapping flex row put three blocks on three lines and left a
+          sticky bar eating a quarter of the viewport on every scroll. */}
+      <header className="sticky top-0 z-30 flex flex-col gap-2.5 border-b border-line bg-canvas/85 px-4 py-2.5 backdrop-blur-md sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-[13px] lg:px-10">
+        <div className="flex items-center justify-between gap-4 sm:justify-start">
           <div className="flex items-center gap-3">
             <div
               aria-hidden="true"
-              className="flex size-10 items-center justify-center rounded-[11px] bg-ink font-mono text-lg font-bold text-white"
+              className="flex size-9 items-center justify-center rounded-[11px] bg-ink font-mono text-base font-bold text-white sm:size-10 sm:text-lg"
             >
               ◈
             </div>
             <div>
-              <p className="text-[16.5px] font-semibold tracking-[-0.01em] text-ink">
+              <p className="text-[15.5px] font-semibold tracking-[-0.01em] text-ink sm:text-[16.5px]">
                 AgroPrice
               </p>
-              <p className="text-xs text-ink-soft">Indicador diário por praça</p>
+              <p className="hidden text-xs text-ink-soft sm:block">
+                Indicador diário por praça
+              </p>
             </div>
           </div>
           <ArmSwitch active="precos" />
         </div>
 
-        <div className="flex flex-wrap items-center gap-[18px]">
-          <div className="text-right leading-[1.35]">
+        <div className="flex items-end gap-3 sm:flex-wrap sm:items-center sm:gap-[18px]">
+          <div className="order-last shrink-0 leading-[1.35] sm:order-none sm:text-right">
             <p className="text-[10.5px] uppercase tracking-[0.07em] text-ink-faint">
               Última cotação
             </p>
